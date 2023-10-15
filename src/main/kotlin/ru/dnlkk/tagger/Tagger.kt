@@ -4,6 +4,7 @@ import api.longpoll.bots.LongPollBot
 import api.longpoll.bots.model.events.messages.MessageNew
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import ru.dnlkk.tagger.configuration.TaggerProperties
 import ru.dnlkk.tagger.infrastructure.MessageBuilder
 import ru.dnlkk.tagger.infrastructure.front_controller.TaggerFrontController
 

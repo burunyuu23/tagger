@@ -35,7 +35,7 @@ class TaggerFrontController {
         val subArgs = argSplit(message.text)
 
         for (controller in controllers) {
-            if (args.first in controller.key) {
+            if (args.first() in controller.key) {
                 var messageBuilder = MessageBuilder.Builder(message.peerId)
                 val c = controller.value
                 val dto = ((c.javaClass.genericInterfaces[0] as ParameterizedType).actualTypeArguments[0] as Class<*>).getDeclaredConstructor().newInstance()
