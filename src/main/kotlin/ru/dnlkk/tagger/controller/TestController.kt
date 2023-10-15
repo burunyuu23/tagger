@@ -1,6 +1,7 @@
 package ru.dnlkk.tagger.controller
 
 import api.longpoll.bots.model.objects.basic.Message
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 import ru.dnlkk.tagger.dto.controller_dto.TestDTO
 import ru.dnlkk.tagger.infrastructure.MessageBuilder
@@ -9,9 +10,10 @@ import ru.dnlkk.tagger.infrastructure.annotation.TaggerArgsMapping
 import ru.dnlkk.tagger.infrastructure.annotation.TaggerDocumented
 import ru.dnlkk.tagger.infrastructure.annotation.TaggerMapping
 
+@ConditionalOnProperty(prefix = "tagger", name = ["is_test"])
 @Component
 @TaggerMapping("!test")
-class TestController: TaggerController<TestDTO> {
+class TestController : TaggerController<TestDTO> {
 
     @TaggerDocumented(description = "Вызывает команду test")
     override fun handle(
@@ -31,6 +33,6 @@ class TestController: TaggerController<TestDTO> {
         messageBuilder: MessageBuilder.Builder,
         dto: TestDTO
     ): MessageBuilder.Builder {
-        return messageBuilder.message(args.map { it.toInt() }.reduce {acc, i -> acc + i}.toString())
+        return messageBuilder.message(args.map { it.toInt() }.reduce { acc, i -> acc + i }.toString())
     }
 }
