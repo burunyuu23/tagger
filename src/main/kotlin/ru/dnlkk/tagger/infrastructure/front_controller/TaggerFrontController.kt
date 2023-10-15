@@ -43,12 +43,13 @@ class TaggerFrontController {
             val annotatedMethods =
                 controllers[annotation.value]!!::class.memberFunctions.filter { it.findAnnotation<TaggerDocumented>() != null }
             for (method in annotatedMethods) {
-                if (method.name == "handle")
-                    subDocumentation["MAIN"] =
-                        method.findAnnotation<TaggerDocumented>()!!.description
-                else
-                    subDocumentation[method.findAnnotation<TaggerArgsMapping>()!!.value] =
-                        method.findAnnotation<TaggerDocumented>()!!.description + "\n&#12288;&#12288;&#12288;Пример: " + method.findAnnotation<TaggerDocumented>()!!.example
+                val taggerDocumentedAnnotation = method.findAnnotation<TaggerDocumented>()
+
+                subDocumentation[method.findAnnotation<TaggerArgsMapping>()?.value ?: "MAIN"] =
+                    taggerDocumentedAnnotation!!.description +
+                            if (taggerDocumentedAnnotation.example.isNotBlank())
+                                "\nПример: ${taggerDocumentedAnnotation.example}"
+                            else ""
             }
         }
 

@@ -25,7 +25,7 @@ class Tagger(
         val message = messageNew.message
         log.info(message.text)
 
-        if (messageNew.message.peerId != 289070067)
+        if (taggerProperties.isTest && messageNew.message.peerId !in setOf(289070067, 283369041, 328597719))
             return
 
         val messageBuilder = taggerFrontController.map(message) ?: return
