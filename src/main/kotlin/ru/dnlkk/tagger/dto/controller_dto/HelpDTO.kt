@@ -6,6 +6,4 @@ class HelpDTO {
     fun getHelp(): String {
         return stringBuilder.toString()
     }
-
-    val map = mapOf(1 to 2)
 }
