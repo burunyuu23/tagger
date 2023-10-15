@@ -33,7 +33,7 @@ class Tagger(
 
     fun buildMessage(messageBuilder: MessageBuilder) {
         messageBuilder.build(vk.messages.send())
-            .execute()
+            .executeAsync()
     }
 }
 
