@@ -1,4 +1,4 @@
-package ru.dnlkk.tagger
+package ru.dnlkk.tagger.configuration
 
 import org.springframework.beans.factory.annotation.Value
 
