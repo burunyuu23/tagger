@@ -45,8 +45,6 @@ class TaggerFrontController {
             }
         )
 
-        println(controllers)
-
         initDocumentation()
         injectDocumentation()
     }
