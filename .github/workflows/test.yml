@@ -14,4 +14,5 @@ jobs:
           java-version: 17
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
+      - run: chmod +x ./gradlew
       - run: ./gradlew build
