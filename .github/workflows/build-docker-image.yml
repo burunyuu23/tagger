@@ -10,6 +10,7 @@ jobs:
   build_docker_image:
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@v4
       # Set environment variable
       - name: set global env
         id: global_env
