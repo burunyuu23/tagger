@@ -1,0 +1,39 @@
+name: Deploy docker image
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'TAGGER-17' # todo remove this before merging
+
+jobs:
+  build_docker_image:
+    runs-on: ubuntu-22.04
+    steps:
+      # Build jar
+      - name: Setup jdk
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+      - run: chmod +x ./gradlew
+      - run: ./gradlew build
+      # Set environment variable
+      - name: set global env
+        id: global_env
+        run: |
+          echo "::set-output name=IMAGE_NAME::${GITHUB_REPOSITORY#*/}"
+          echo "::set-output name=DOCKERHUB_IMAGE_NAME::docker.pkg.github.com/${GITHUB_REPOSITORY}/${GITHUB_REPOSITORY#*/}"
+      # Build Docker image:
+      - name: Build and tag image
+        run: |
+          docker build -t "${{ steps.global_env.outputs.DOCKERHUB_IMAGE_NAME }}:latest" -t "${{ steps.global_env.outputs.DOCKERHUB_IMAGE_NAME }}:${GITHUB_SHA::8}" .
+      - name: Docker login
+        run: docker login docker.pkg.github.com -u $GITHUB_ACTOR -p ${{secrets.GITHUB_TOKEN}}
+      # Publish image to github package repository:
+      - name: Publish image
+        env:
+          IMAGE_NAME: $GITHUB_REPOSITORY
+        run: docker push "docker.pkg.github.com/$GITHUB_REPOSITORY/${{ steps.global_env.outputs.IMAGE_NAME }}"
