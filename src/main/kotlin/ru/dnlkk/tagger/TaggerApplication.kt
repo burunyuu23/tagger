@@ -1,6 +1,7 @@
 package ru.dnlkk.tagger
 
 import jakarta.annotation.PostConstruct
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
@@ -14,17 +15,11 @@ class TaggerApplication {
 
     @Bean
     fun taggerBean(
-        properties: TaggerProperties,
-        taggerFrontController: TaggerFrontController
-    ) = Tagger(properties, taggerFrontController).apply {
+        @Qualifier("taggerProperties") taggerProperties: TaggerProperties,
+        @Qualifier("taggerFrontController") taggerFrontController: TaggerFrontController
+    ) = Tagger(taggerProperties, taggerFrontController).apply {
         startPolling()
     }
-
-    @Bean
-    fun properties() = TaggerProperties()
-
-    @Bean
-    fun frontController() = TaggerFrontController()
 
     @PostConstruct
     fun setDefaultTimezone() {
