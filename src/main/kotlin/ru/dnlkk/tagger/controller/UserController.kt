@@ -60,11 +60,12 @@ class UserController @Autowired constructor(private val userService: UserService
         if (args.size !in 1..3) {
             throw Exception("Неправильно указана группа")
         }
+        // TODO: вынести в общий метод (повторяется в LessonController) (не должен повторяться)
         val group = user?.group
         dto.groupDto = GroupDto().apply {
             subgroup = args[args.lastIndex].toIntOrNull() ?: group?.subgroup ?: subgroup
             groupId = if (args.size >= 2) args[args.lastIndex - 1] else group?.groupId ?: groupId
-            course = if (args.size >= 3) args[args.lastIndex - 2].toIntOrNull() ?: course else  group?.course ?:course
+            course = if (args.size >= 3) args[args.lastIndex - 2].toIntOrNull() ?: course else group?.course ?: course
         }
         return messageBuilder
     }

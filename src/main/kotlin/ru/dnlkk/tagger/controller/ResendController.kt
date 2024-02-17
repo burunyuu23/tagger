@@ -12,7 +12,7 @@ import ru.dnlkk.tagger.infrastructure.annotation.TaggerArgsMapping
 import ru.dnlkk.tagger.infrastructure.annotation.TaggerMapping
 import ru.dnlkk.tagger.infrastructure.annotation.TaggerMappingRole
 import ru.dnlkk.tagger.service.UserService
-import ru.dnlkk.tagger.util.TaggerConstants
+import ru.dnlkk.tagger.util.TaggerConstants.GROUP_ID
 
 @Component
 @TaggerMappingRole([UserRole.ADMIN])
@@ -25,9 +25,7 @@ class ResendController @Autowired constructor(private val userService: UserServi
         messageBuilder: MessageBuilder.Builder,
         dto: ResendDTO
     ): MessageBuilder {
-        if (dto.toId == null) {
-            dto.toId = TaggerConstants.GROUP_ID
-        }
+        dto.toId = dto.toId ?: GROUP_ID
         messageBuilder.message(dto.text)
         return messageBuilder.peerId(dto.toId!!).build()
     }
