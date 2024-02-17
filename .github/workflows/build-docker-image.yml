@@ -1,0 +1,32 @@
+name: Deploy docker image
+
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  build_docker_image:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      # Set environment variable
+      - name: set global env
+        id: global_env
+        run: |
+          echo "::set-output name=IMAGE_NAME::${GITHUB_REPOSITORY#*/}"
+          echo "::set-output name=DOCKERHUB_IMAGE_NAME::docker.pkg.github.com/${GITHUB_REPOSITORY}/${GITHUB_REPOSITORY#*/}"
+      # Build Docker image:
+      - name: Build and tag image
+        run: |
+          docker build -t "${{ steps.global_env.outputs.DOCKERHUB_IMAGE_NAME }}:latest" -t "${{ steps.global_env.outputs.DOCKERHUB_IMAGE_NAME }}:${GITHUB_SHA::8}" .
+      - name: Docker login
+        run: docker login docker.pkg.github.com -u $GITHUB_ACTOR -p ${{secrets.GITHUB_TOKEN}}
+      # Publish image to github package repository:
+      - name: Publish image
+        env:
+          IMAGE_NAME: $GITHUB_REPOSITORY
+        run: docker push "docker.pkg.github.com/$GITHUB_REPOSITORY/${{ steps.global_env.outputs.IMAGE_NAME }}"
