@@ -5,11 +5,13 @@ import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
+import org.springframework.util.ResourceUtils
 import ru.dnlkk.tagger.entity.Group
 import ru.dnlkk.tagger.entity.LessonTime
 import ru.dnlkk.tagger.util.parseLessonString
-import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
 import java.time.DayOfWeek
@@ -17,9 +19,8 @@ import java.time.DayOfWeek
 @Service
 class RaspisanieFromExcelService(private val lessonService: LessonService) {
 
-    fun readExcelFromFile(filePath: String): List<List<String>> {
-        val file = File(filePath)
-        val inputStream: InputStream = FileInputStream(file)
+    fun readExcelFromFile(resource: Resource): List<List<String>> {
+        val inputStream: InputStream = resource.inputStream
         return readExcel(inputStream)
     }
 
