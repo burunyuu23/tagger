@@ -1,9 +1,11 @@
 services:
-  postgres:
-    image: 'postgres:latest'
+  tagger-postgres:
+    image: postgres:14
+    volumes:
+      - ./tagger-postgres/data:/var/lib/postgresql/data
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      POSTGRES_USER: ${POSTGRESQL_TAGGER_USER}
+      POSTGRES_PASSWORD: ${POSTGRESQL_TAGGER_PASS}
+      POSTGRES_DB: ${POSTGRESQL_TAGGER_DB}
     ports:
-      - '5432'
+      - ${POSTGRESQL_TAGGER_PORT}:5432

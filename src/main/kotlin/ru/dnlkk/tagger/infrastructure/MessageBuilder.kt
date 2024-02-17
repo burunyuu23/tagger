@@ -11,7 +11,7 @@ class MessageBuilder private constructor(
     val photo: File?,
 ) {
 
-    class Builder(private val peerId: Int) {
+    class Builder(private var peerId: Int) {
         var message: String? = ""
             private set
         var attachment: String? = null
@@ -21,7 +21,10 @@ class MessageBuilder private constructor(
         var photo: File? = null
             private set
 
-        fun message(message: String?) = apply { this.message = message }
+        fun peerId(peerId: Int) = apply { this.peerId = peerId }
+        fun message(message: String?) = apply { this.message += message }
+        fun messageNewLine(message: String?) = apply { this.message += "\n$message" }
+        fun clearMessage(message: String?) = apply { this.message = message }
         fun attachment(attachment: String?) = apply { this.attachment = attachment }
         fun stickerId(stickerId: Int?) = apply { this.stickerId = stickerId }
         fun photo(photo: File?) = apply { this.photo = photo }
@@ -36,4 +39,10 @@ class MessageBuilder private constructor(
         attachment?.let { send.setAttachment(it) }
         return send.setPeerId(peerId)
     }
+
+    override fun toString(): String {
+        return "MessageBuilder(peerId=$peerId, message=$message, attachment=$attachment, stickerId=$stickerId, photo=$photo)"
+    }
+
+
 }

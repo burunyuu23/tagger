@@ -7,26 +7,34 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Component
+import org.springframework.stereotype.Repository
+import ru.dnlkk.tagger.dto.repository_dto.HelpDocDto
+import ru.dnlkk.tagger.entity.User
+import ru.dnlkk.tagger.entity.haveNeedRole
 import ru.dnlkk.tagger.infrastructure.MessageBuilder
 import ru.dnlkk.tagger.infrastructure.TaggerController
-import ru.dnlkk.tagger.infrastructure.annotation.TaggerArgsMapping
-import ru.dnlkk.tagger.infrastructure.annotation.TaggerDocumented
-import ru.dnlkk.tagger.infrastructure.annotation.TaggerHelp
-import ru.dnlkk.tagger.infrastructure.annotation.TaggerMapping
+import ru.dnlkk.tagger.infrastructure.annotation.*
+import ru.dnlkk.tagger.repository.UserRepository
 import java.lang.reflect.ParameterizedType
+import kotlin.jvm.optionals.getOrNull
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberFunctions
+import kotlin.reflect.jvm.javaType
 import kotlin.reflect.jvm.jvmName
 
 @Component
 class TaggerFrontController {
     @Autowired
     private lateinit var context: ApplicationContext
+
+    @Autowired
+    private lateinit var userRepository: UserRepository
+
     private val controllers: MutableMap<String, TaggerController<Any>> = HashMap()
-    private val documentation: MutableMap<String, MutableMap<String, String>> = HashMap()
+    private val documentation: MutableMap<HelpDocDto, MutableMap<HelpDocDto, String>> = HashMap()
 
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -51,10 +59,13 @@ class TaggerFrontController {
 
     fun initDocumentation() {
         controllers.forEach { (key, controller) ->
+
+            val taggerControllerNeedRole = controller::class.findAnnotation<TaggerMappingRole>()?.value
             controller::class.memberFunctions
                 .filter { it.findAnnotation<TaggerDocumented>() != null }
                 .forEach { method ->
                     val taggerDocumentedAnnotation = method.findAnnotation<TaggerDocumented>()
+                    val taggerMethodNeedRole = method.findAnnotation<TaggerMappingRole>()?.value
                     val subArgsKey = method.findAnnotation<TaggerArgsMapping>()?.value ?: "MAIN"
                     val description =
                         taggerDocumentedAnnotation!!.description +
@@ -62,7 +73,8 @@ class TaggerFrontController {
                                     "\nПример: ${taggerDocumentedAnnotation.example}"
                                 else ""
 
-                    documentation.computeIfAbsent(key) { HashMap() }[subArgsKey] = description
+                    documentation.computeIfAbsent(HelpDocDto(key, taggerControllerNeedRole?.toList()))
+                    { HashMap() }[HelpDocDto(subArgsKey, taggerMethodNeedRole?.toList())] = description
                 }
         }
     }
@@ -82,26 +94,53 @@ class TaggerFrontController {
     fun dispatch(message: Message): MessageBuilder? {
         val subArgs = argSplit(message.text)
 
-        for ((key, controller) in controllers) {
-            if (controller.mapping(message.text, key)) {
-                val messageBuilder = MessageBuilder.Builder(message.peerId)
-                val dto = createDtoInstance(controller)
+        val messageBuilder = MessageBuilder.Builder(message.peerId)
 
-                for ((subArgsKey, method) in findAnnotatedMethods(controller)) {
-                    subArgs[subArgsKey]?.let {
+        val user = userRepository.findById(message.fromId).getOrNull()
+        try {
+            for ((key, controller) in controllers) {
+                if (controller.mapping(message.text, key)) {
+                    val needRoles = controller::class.findAnnotation<TaggerMappingRole>()?.value
+                    if (!haveNeedRole(needRoles?.toList(), user)) {
+                        throw Exception("Тебе сюда нельзя")
+                    }
+
+                    val dto = createDtoInstance(controller)
+
+                    for ((subArgsKey, args) in subArgs.entries) {
+                        val controllerMethod = controller::class.memberFunctions.find {
+                            subArgsKey == it.findAnnotation<TaggerArgsMapping>()?.value
+                        }
+                        if (controllerMethod == null) {
+                            throw Exception(
+                                "Ошибка при вызове метода " +
+                                        (controllers["/h"]
+                                            ?.javaClass
+                                            ?.getMethod("buildDocBlock", Map.Entry::class.java)
+                                            ?.invoke(controllers["/h"], documentation.entries.find { it.key.path == key })
+                                            ?: "").toString()
+                            )
+                        }
                         handleMethodInvocation(
-                            method,
+                            controllerMethod,
                             controller,
                             message,
-                            it,
+                            user,
+                            args,
                             messageBuilder,
                             dto
                         )
                     }
-                }
 
-                return controller.handle(message, subArgs, messageBuilder, dto)
+                    return controller.handle(message, user, subArgs, messageBuilder, dto)
+
+                }
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            println(e.message)
+            messageBuilder.clearMessage(e.message)
+            return messageBuilder.build()
         }
 
         return null
@@ -113,28 +152,66 @@ class TaggerFrontController {
         return genericType.getDeclaredConstructor().newInstance()
     }
 
-    private fun findAnnotatedMethods(controller: TaggerController<Any>): List<Pair<String, KFunction<*>>> {
-        return controller::class.memberFunctions
-            .filter { it.findAnnotation<TaggerArgsMapping>() != null }
-            .map { it.findAnnotation<TaggerArgsMapping>()!!.value to it }
-    }
-
     private fun handleMethodInvocation(
         method: KFunction<*>,
         controller: TaggerController<Any>,
         message: Message,
+        user: User?,
         subArgs: Array<String>,
         messageBuilder: MessageBuilder.Builder,
         dto: Any
     ) {
-        method.call(controller, message, subArgs, messageBuilder, dto)
+        try {
+            val methodArgs = method.parameters[3].type.javaType as Class<*>
+            if (methodArgs == Boolean::class.java) {
+                method.call(controller, message, true, messageBuilder, dto)
+                return
+            }
+            val isArray = methodArgs.isArray
+            var checkMethodArgs = methodArgs
+            if (isArray) {
+                checkMethodArgs = methodArgs.componentType
+            }
+            val convertedArgs = subArgs.map { param ->
+                var convertedParam = when (checkMethodArgs) {
+                    Number::class.javaObjectType, Number::class.javaPrimitiveType -> param.toInt()
+                    Int::class.javaObjectType, Int::class.javaPrimitiveType -> param.toInt()
+                    Boolean::class.javaObjectType, Boolean::class.javaPrimitiveType -> param.toBoolean()
+                    Long::class.javaObjectType, Long::class.javaPrimitiveType -> param.toLong()
+                    Double::class.javaObjectType, Double::class.javaPrimitiveType -> param.toDouble()
+                    else -> param
+                }
+                if (checkMethodArgs.isEnum) {
+                    convertedParam = checkMethodArgs.getDeclaredMethod("valueOf", String::class.java)
+                        .invoke(methodArgs, param)
+                }
+                checkMethodArgs.cast(convertedParam)
+            }
+            val resultArray = java.lang.reflect.Array.newInstance(checkMethodArgs, convertedArgs.size) as Array<*>
+            for (i in 0 until convertedArgs.size) {
+                resultArray[i] = convertedArgs[i] as Nothing
+            }
+            var callArg: Any? = resultArray
+            if (!isArray) {
+                callArg = resultArray[0]
+            }
+            method.call(controller, message, user, callArg, messageBuilder, dto)
+        } catch (e: Exception) {
+            val adminInfo = "MethodName: ${method.name}, args: ${subArgs.toList()}, "
+            val argMapping = method.findAnnotation<TaggerArgsMapping>()?.value
+            val controllerPath = controller::class.findAnnotation<TaggerMapping>()?.value
+            val mappingDoc = documentation[HelpDocDto(controllerPath ?: "")]?.get(HelpDocDto(argMapping ?: ""))
+            val errorInfo = "Error: ${e.message}" +
+                    if (mappingDoc != null) "\n\nМесто ошибки:\n$argMapping: $mappingDoc" else ""
+            log.error(adminInfo + errorInfo)
+            throw Exception(errorInfo)
+        }
     }
-
 
     fun argSplit(input: String): Map<String, Array<String>> {
         val pattern = "(-\\S+)(?:\\s(?!-\\S+)(.*?)(?=\\s-\\S+|\$))?".toRegex()
         val matches = pattern.findAll(input)
-        val result = HashMap<String, Array<String>>()
+        val result = LinkedHashMap<String, Array<String>>()
 
         for (match in matches) {
             val key = match.groupValues[1]
