@@ -24,6 +24,6 @@ class TaggerApplication {
     fun frontController() = TaggerFrontController()
 }
 
-fun main() {
-    runApplication<TaggerApplication>()
+fun main(args: Array<String>) {
+    runApplication<TaggerApplication>(*args)
 }
