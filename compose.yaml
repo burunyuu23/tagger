@@ -11,6 +11,8 @@ services:
       POSTGRES_DB: ${POSTGRESQL_TAGGER_DB}
     ports:
       - ${POSTGRESQL_TAGGER_PORT}:5432
+    networks:
+      - tagger
   cavo:
     image: ghcr.io/burunyuu23/tagger/tagger:latest
     ports:
@@ -20,6 +22,8 @@ services:
       - tagger-postgres
     env_file:
       - ./.env
+    networks:
+      - tagger
   watchtower:
     image: containrrr/watchtower
     volumes:
@@ -27,3 +31,6 @@ services:
     environment:
       WATCHTOWER_CLEANUP: 'true'
     command: --interval 30
+
+networks:
+  tagger:
