@@ -13,7 +13,6 @@ import ru.dnlkk.tagger.infrastructure.annotation.TaggerMapping
 import ru.dnlkk.tagger.infrastructure.annotation.TaggerMappingRole
 import ru.dnlkk.tagger.service.RaspisanieFromExcelService
 
-
 @Component
 @TaggerMapping("/rasp")
 @TaggerMappingRole([UserRole.ADMIN])
