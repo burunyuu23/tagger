@@ -33,12 +33,16 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.slf4j:slf4j-api")
-//    runtimeOnly("org.postgresql:postgresql")
-//    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-//    implementation("org.springframework.boot:spring-boot-starter-validation")
+    runtimeOnly("org.postgresql:postgresql")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+//    Excel и запросы
+    implementation("org.apache.poi:poi:5.2.3")
+    implementation("org.apache.poi:poi-ooxml:5.2.3")
+    implementation("org.apache.httpcomponents:httpclient:4.5.13")
 }
 
 tasks.withType<KotlinCompile> {
@@ -46,6 +50,11 @@ tasks.withType<KotlinCompile> {
         freeCompilerArgs += "-Xjsr305=strict"
         jvmTarget = "17"
     }
+}
+
+tasks.jar {
+    archiveFileName = "tagger.jar"
+    destinationDirectory = file("build/libs")
 }
 
 tasks.withType<Test> {
