@@ -1,2 +1,5 @@
 tagger:
   access_token: ${TAGGER_TOKEN}
+logging:
+  pattern:
+    dateformat: yyyy-MM-dd HH:mm:ss.SSS,Europe/Moscow
