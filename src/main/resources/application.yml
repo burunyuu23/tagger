@@ -10,3 +10,7 @@ spring:
     url: jdbc:postgresql://${POSTGRESQL_TAGGER_CONTAINER_NAME}:${POSTGRESQL_TAGGER_PORT}/${POSTGRESQL_TAGGER_DB}
     username: ${POSTGRESQL_TAGGER_USER}
     password: ${POSTGRESQL_TAGGER_PASS}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql

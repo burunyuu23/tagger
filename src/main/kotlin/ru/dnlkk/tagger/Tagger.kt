@@ -5,16 +5,18 @@ import api.longpoll.bots.model.events.messages.MessageNew
 import jakarta.annotation.PostConstruct
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import ru.dnlkk.tagger.configuration.TaggerProperties
 import ru.dnlkk.tagger.infrastructure.MessageBuilder
 import ru.dnlkk.tagger.infrastructure.front_controller.TaggerFrontController
 
 @Component
-class Tagger(
+class Tagger @Autowired constructor(
     private val taggerProperties: TaggerProperties,
     private val taggerFrontController: TaggerFrontController
 ) : LongPollBot() {
+
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
     }

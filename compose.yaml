@@ -16,6 +16,8 @@ services:
     ports:
       - "443:3443"
       - "80:3080"
+    depends_on:
+      - tagger-postgres
     env_file:
       - ./.env
   watchtower:
