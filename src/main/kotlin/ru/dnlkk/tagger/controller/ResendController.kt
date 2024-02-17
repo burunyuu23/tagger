@@ -4,7 +4,6 @@ import api.longpoll.bots.model.objects.basic.Message
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import ru.dnlkk.tagger.dto.controller_dto.ResendDTO
-import ru.dnlkk.tagger.dto.controller_dto.UserDTO
 import ru.dnlkk.tagger.entity.User
 import ru.dnlkk.tagger.entity.UserRole
 import ru.dnlkk.tagger.infrastructure.MessageBuilder
@@ -13,13 +12,12 @@ import ru.dnlkk.tagger.infrastructure.annotation.TaggerArgsMapping
 import ru.dnlkk.tagger.infrastructure.annotation.TaggerMapping
 import ru.dnlkk.tagger.infrastructure.annotation.TaggerMappingRole
 import ru.dnlkk.tagger.service.UserService
+import ru.dnlkk.tagger.util.TaggerConstants
 
 @Component
 @TaggerMappingRole([UserRole.ADMIN])
 @TaggerMapping("/resend")
 class ResendController @Autowired constructor(private val userService: UserService) : TaggerController<ResendDTO> {
-    val groupId: Int = 2000000001
-
     override fun handle(
         message: Message,
         user: User?,
@@ -28,7 +26,7 @@ class ResendController @Autowired constructor(private val userService: UserServi
         dto: ResendDTO
     ): MessageBuilder {
         if (dto.toId == null) {
-            dto.toId = groupId
+            dto.toId = TaggerConstants.GROUP_ID
         }
         messageBuilder.message(dto.text)
         return messageBuilder.peerId(dto.toId!!).build()
