@@ -31,11 +31,10 @@ class Tagger(
         val message = messageNew.message
         log.info(message.text)
 
-        if (taggerProperties.isTest && messageNew.message.peerId !in setOf(283369041, 328597719))
+        if (taggerProperties.isTest && messageNew.message.peerId !in setOf(289070067, 283369041, 328597719))
             return
 
         val messageBuilder = taggerFrontController.dispatch(message) ?: return
-        println(messageBuilder)
         buildMessage(messageBuilder)
     }
 
