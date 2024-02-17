@@ -11,6 +11,4 @@ class LectorService(
     private val groupRepository: GroupRepository,
     private val lectorRepository: LectorRepository,
     ) {
-
-
 }

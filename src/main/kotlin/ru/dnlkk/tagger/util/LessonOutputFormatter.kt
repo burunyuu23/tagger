@@ -14,9 +14,9 @@ fun raspisanieLessonsFormat(lessons: List<Lesson>): List<Lesson> {
         if (lessonTime.startTime > lastLesson.lessonTime.endTime) {
             return lessonsTime
         }
-        else {
-            val lesson = lessons.find { it.lessonTime.startTime == lessonTime.startTime }
-            lessonsTime.add(lesson ?: Lesson(
+        val lesson = lessons.find { it.lessonTime.startTime == lessonTime.startTime }
+        lessonsTime.add(
+            lesson ?: Lesson(
                 lessonTime = lessonTime,
                 study = Study(name = "Окно"),
                 auditorium = null,
@@ -24,8 +24,8 @@ fun raspisanieLessonsFormat(lessons: List<Lesson>): List<Lesson> {
                 dayOfWeek = lastLesson.dayOfWeek,
                 week = lastLesson.week,
                 group = lastLesson.group
-                ))
-        }
+            )
+        )
     }
     return lessons
 }

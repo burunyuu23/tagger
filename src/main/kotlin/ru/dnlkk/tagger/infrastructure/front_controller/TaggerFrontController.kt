@@ -101,7 +101,7 @@ class TaggerFrontController {
             for ((key, controller) in controllers) {
                 if (controller.mapping(message.text, key)) {
                     val needRoles = controller::class.findAnnotation<TaggerMappingRole>()?.value
-                    if (!haveNeedRole(needRoles?.toList(), user)) {
+                    if (haveNeedRole(needRoles?.toList(), user).not()) {
                         throw Exception("Тебе сюда нельзя")
                     }
 
@@ -192,7 +192,7 @@ class TaggerFrontController {
                 resultArray[i] = convertedArgs[i] as Nothing
             }
             var callArg: Any? = resultArray
-            if (!isArray) {
+            if (isArray.not()) {
                 callArg = resultArray[0]
             }
             method.call(controller, message, user, callArg, messageBuilder, dto)
