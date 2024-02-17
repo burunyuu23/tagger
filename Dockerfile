@@ -1,17 +1,7 @@
 FROM gradle:7.6.4-jdk17-alpine AS jar-build
-ENV APP_HOME=/app
-WORKDIR $APP_HOME
-COPY build.gradle.kts settings.gradle.kts $APP_HOME
-
-COPY gradle $APP_HOME/gradle
-COPY --chown=gradle:gradle . /home/gradle/src
-USER root
-RUN chown -R gradle /home/gradle/src
-
-RUN gradle build --stacktrace || return 0
+WORKDIR /app
 COPY . .
-RUN gradle clean bootJar
-#
+RUN gradle bootJar
 #FROM eclipse-temurin:17 as app-build
 #ENV RELEASE=17
 #
