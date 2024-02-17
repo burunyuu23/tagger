@@ -13,7 +13,7 @@ import java.util.*
 class TaggerApplication {
 
     @Bean
-    fun tagger(
+    fun taggerBean(
         properties: TaggerProperties,
         taggerFrontController: TaggerFrontController
     ) = Tagger(properties, taggerFrontController).apply {
@@ -21,7 +21,7 @@ class TaggerApplication {
     }
 
     @Bean
-    fun taggerProperties() = TaggerProperties()
+    fun properties() = TaggerProperties()
 
     @Bean
     fun frontController() = TaggerFrontController()
