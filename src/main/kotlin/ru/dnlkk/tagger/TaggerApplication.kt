@@ -10,7 +10,6 @@ import java.util.*
 class TaggerApplication {
     @PostConstruct
     fun setDefaultTimezone() {
-        Locale.setDefault(Locale.of("ru", "RU"))
         TimeZone.setDefault(TimeZone.getTimeZone(ZoneId.of("Europe/Moscow")))
     }
 }
