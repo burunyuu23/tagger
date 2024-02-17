@@ -12,9 +12,9 @@ import ru.dnlkk.tagger.infrastructure.annotation.TaggerMapping
 @Component
 @TaggerMapping(value = "гойда")
 class GoidaController: TaggerController<GoidaDTO> {
+    private val regex = Regex("^[г|Г]+\\s*[о|О|0|o|O]+\\s*[й|Й]+\\s*[д|Д]+\\s*[а|А|a|A]+.*\$")
 
     override fun mapping(message: String, value: String): Boolean {
-        val regex = Regex("^[г|Г]+\\s*[о|О|0|o|O]+\\s*[й|Й]+\\s*[д|Д]+\\s*[а|А|a|A]+.*\$")
         return regex.containsMatchIn(message)
     }
 
