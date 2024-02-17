@@ -1,6 +1,7 @@
 services:
   tagger-postgres:
     image: postgres:14
+    container_name: ${POSTGRESQL_TAGGER_CONTAINER_NAME}
     volumes:
       - ./tagger-postgres/data:/var/lib/postgresql/data
       - ./tagger-postgres/init:/docker-entrypoint-initdb.d
@@ -10,3 +11,17 @@ services:
       POSTGRES_DB: ${POSTGRESQL_TAGGER_DB}
     ports:
       - ${POSTGRESQL_TAGGER_PORT}:5432
+  cavo:
+    image: ghcr.io/burunyuu23/tagger/tagger:latest
+    ports:
+      - "443:3443"
+      - "80:3080"
+    env_file:
+      - ./.env
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      WATCHTOWER_CLEANUP: 'true'
+    command: --interval 30
