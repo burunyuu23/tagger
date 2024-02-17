@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - 'master'
-      - 'TAGGER-17' # todo remove this before merging
 
 jobs:
   build_docker_image:
