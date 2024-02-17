@@ -14,3 +14,5 @@ spring:
     hibernate:
       ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  web:
+    locale: ru_RU
