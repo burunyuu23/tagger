@@ -8,7 +8,7 @@ COPY --chown=gradle:gradle . /home/gradle/src
 USER root
 RUN chown -R gradle /home/gradle/src
 
-RUN gradle build || return 0
+RUN gradle build --stacktrace || return 0
 COPY . .
 RUN gradle clean bootJar
 
