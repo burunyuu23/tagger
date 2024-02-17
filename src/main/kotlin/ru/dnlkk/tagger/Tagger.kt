@@ -5,12 +5,10 @@ import api.longpoll.bots.model.events.messages.MessageNew
 import jakarta.annotation.PostConstruct
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component
 import ru.dnlkk.tagger.configuration.TaggerProperties
 import ru.dnlkk.tagger.infrastructure.MessageBuilder
 import ru.dnlkk.tagger.infrastructure.front_controller.TaggerFrontController
 
-@Component
 class Tagger(
     private val taggerProperties: TaggerProperties,
     private val taggerFrontController: TaggerFrontController
