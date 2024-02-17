@@ -33,10 +33,7 @@ class RaspisanieFromExcelController (
         if (resource == null) {
             throw Exception("Ты дурак нет такого файла!")
         }
-        val excelData = excelService.readExcelFromFile(resource!!)
-        excelData.forEach { row ->
-            println(row.joinToString(", "))
-        }
+        excelService.readExcelFromFile(resource!!)
         messageBuilder.message(message.text)
         return messageBuilder.build()
     }
