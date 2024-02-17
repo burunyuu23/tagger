@@ -5,5 +5,4 @@ package ru.dnlkk.tagger.infrastructure.annotation
  * If empty or not unique, then equals the name of the controller
  */
 @Target(AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.RUNTIME)
 annotation class TaggerMapping(val value: String)
