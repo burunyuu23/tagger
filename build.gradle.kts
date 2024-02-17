@@ -52,11 +52,6 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-tasks.jar {
-    archiveFileName = "tagger.jar"
-    destinationDirectory = file("build/libs")
-}
-
 tasks.withType<Test> {
     useJUnitPlatform()
 }
