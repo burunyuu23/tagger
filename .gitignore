@@ -39,4 +39,5 @@ out/
 
 .env
 /src/main/resources/application-local.yml
-tagger-postgres/data
+tagger-postgres
+!tagger-postgres/init

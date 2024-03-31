@@ -4,10 +4,13 @@ import api.longpoll.bots.model.objects.basic.Message
 import org.springframework.stereotype.Component
 import ru.dnlkk.tagger.dto.controller_dto.GoidaDTO
 import ru.dnlkk.tagger.entity.User
+import ru.dnlkk.tagger.entity.UserRole
 import ru.dnlkk.tagger.infrastructure.MessageBuilder
 import ru.dnlkk.tagger.infrastructure.TaggerController
+import ru.dnlkk.tagger.infrastructure.annotation.TaggerArgsMapping
 import ru.dnlkk.tagger.infrastructure.annotation.TaggerDocumented
 import ru.dnlkk.tagger.infrastructure.annotation.TaggerMapping
+import ru.dnlkk.tagger.infrastructure.annotation.TaggerMappingRole
 
 @Component
 @TaggerMapping(value = "гойда")
@@ -16,6 +19,26 @@ class GoidaController: TaggerController<GoidaDTO> {
 
     override fun mapping(message: String, value: String): Boolean {
         return regex.containsMatchIn(message)
+    }
+
+
+    @TaggerDocumented(
+        description = "лол",
+        example = "тест"
+    )
+    @TaggerArgsMapping("-прикол")
+    @TaggerMappingRole([UserRole.ADMIN])
+    fun interest(
+        message: Message,
+        user: User?,
+        args: Map<String, Array<String>>,
+        messageBuilder: MessageBuilder.Builder,
+        dto: GoidaDTO
+    ): MessageBuilder{
+        return messageBuilder
+            .message(message.text.uppercase().plus("!".repeat(message.text.length)))
+            .attachment("photo-207300901_457239033")
+            .build()
     }
 
     @TaggerDocumented(

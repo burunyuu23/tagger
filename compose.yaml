@@ -11,9 +11,9 @@ services:
       POSTGRES_DB: ${POSTGRESQL_TAGGER_DB}
     ports:
       - ${POSTGRESQL_TAGGER_PORT}:5432
-    networks:
+    networks: 
       - tagger
-  cavo:
+  tagger:
     image: ghcr.io/burunyuu23/tagger/tagger:latest
     ports:
       - "443:3443"
@@ -24,13 +24,6 @@ services:
       - ./.env
     networks:
       - tagger
-  watchtower:
-    image: containrrr/watchtower
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      WATCHTOWER_CLEANUP: 'true'
-    command: --interval 30
 
 networks:
   tagger:

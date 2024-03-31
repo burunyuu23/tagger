@@ -30,3 +30,15 @@ jobs:
         env:
           IMAGE_NAME: $GITHUB_REPOSITORY
         run: docker push "docker.pkg.github.com/$GITHUB_REPOSITORY/${{ steps.global_env.outputs.IMAGE_NAME }}"
+
+      - name: Update Docker Compose containers on server
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: update_stand.yml
+          directory: production/
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          inventory: |
+            [tagger]
+            tagger ansible_host=${{ secrets.SERVER_IP }} ansible_port=22 ansible_ssh_user=${{ secrets.SERVER_USERNAME }}
+          options: |
+            -e project_src=${{ secrets.PROJECT_SRC_PATH }}
