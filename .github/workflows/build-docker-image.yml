@@ -38,6 +38,7 @@ jobs:
       contents: read
       packages: write
     steps:
+      - uses: actions/checkout@v4
       - name: Update Docker Compose containers on server
         uses: dawidd6/action-ansible-playbook@v2
         with:
