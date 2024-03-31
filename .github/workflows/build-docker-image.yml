@@ -31,6 +31,12 @@ jobs:
           IMAGE_NAME: $GITHUB_REPOSITORY
         run: docker push "docker.pkg.github.com/$GITHUB_REPOSITORY/${{ steps.global_env.outputs.IMAGE_NAME }}"
 
+  deploy:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
       - name: Update Docker Compose containers on server
         uses: dawidd6/action-ansible-playbook@v2
         with:
