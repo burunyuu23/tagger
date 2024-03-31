@@ -6,7 +6,7 @@ on:
       - 'master'
 
 jobs:
-  build_docker_image:
+  build_dockerimage:
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -32,6 +32,7 @@ jobs:
         run: docker push "docker.pkg.github.com/$GITHUB_REPOSITORY/${{ steps.global_env.outputs.IMAGE_NAME }}"
 
   deploy:
+    needs: build_dockerimage
     runs-on: ubuntu-22.04
     permissions:
       contents: read
