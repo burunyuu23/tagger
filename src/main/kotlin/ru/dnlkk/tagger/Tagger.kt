@@ -2,17 +2,17 @@ package ru.dnlkk.tagger
 
 import api.longpoll.bots.LongPollBot
 import api.longpoll.bots.model.events.messages.MessageNew
-import jakarta.annotation.PostConstruct
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.event.ContextRefreshedEvent
+import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import ru.dnlkk.tagger.configuration.TaggerProperties
 import ru.dnlkk.tagger.infrastructure.MessageBuilder
 import ru.dnlkk.tagger.infrastructure.front_controller.TaggerFrontController
 
 @Component
-class Tagger @Autowired constructor(
+class Tagger(
     private val taggerProperties: TaggerProperties,
     private val taggerFrontController: TaggerFrontController
 ) : LongPollBot() {
@@ -21,7 +21,7 @@ class Tagger @Autowired constructor(
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
     }
 
-    @PostConstruct
+    @EventListener(ContextRefreshedEvent::class)
     fun start() = startPolling()
 
     override fun getAccessToken(): String {
